@@ -1,0 +1,1052 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Programme 5km — Sub 18:00</title>
+<link href="https://fonts.googleapis.com/css2?family=SF+Pro+Display:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg-top: #0a0e1a;
+    --bg-mid: #0d1525;
+    --bg-bot: #060a12;
+    --glass-bg: rgba(255,255,255,0.04);
+    --glass-bg-strong: rgba(255,255,255,0.08);
+    --glass-border: rgba(255,255,255,0.18);
+    --glass-border-bright: rgba(255,255,255,0.35);
+    --glass-shine: rgba(255,255,255,0.25);
+    --accent: #b5ff47;
+    --accent2: #47c8ff;
+    --accent3: #ff6b35;
+    --text: #f5f5f7;
+    --muted: rgba(245,245,247,0.5);
+    --c-recup: #4a9eff;
+    --c-ef: #30d158;
+    --c-tempo: #ff9f0a;
+    --c-frac: #ff453a;
+    --c-longue: #bf5af2;
+    --c-cross: #32d2c8;
+    --c-repos: rgba(255,255,255,0.2);
+  }
+
+  * { margin:0; padding:0; box-sizing:border-box; }
+  html { scroll-behavior:smooth; }
+
+  body {
+    font-family: 'Inter', -apple-system, sans-serif;
+    background: linear-gradient(180deg, #0a0e1a 0%, #080c18 100%);
+    color: var(--text);
+    min-height:100vh;
+    overflow-x:hidden;
+    position:relative;
+  }
+
+  /* NOISE TEXTURE OVERLAY for depth */
+  body::before {
+    content:'';
+    position:fixed; inset:0; z-index:0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+    background-size: 200px 200px;
+    pointer-events:none;
+    opacity:0.35;
+  }
+
+  /* ANIMATED BACKGROUND BLOBS */
+  .bg-canvas {
+    position:fixed; inset:0; z-index:0; overflow:hidden; pointer-events:none;
+  }
+
+  .blob {
+    position:absolute;
+    border-radius:50%;
+    filter:blur(80px);
+    opacity:0.45;
+    animation:drift 18s ease-in-out infinite alternate;
+  }
+
+  .blob1 {
+    width:600px; height:600px;
+    background:radial-gradient(circle, #1a3a8f 0%, #0a1f5c 60%, transparent 100%);
+    top:-100px; left:-100px;
+    animation-duration:22s;
+  }
+  .blob2 {
+    width:500px; height:500px;
+    background:radial-gradient(circle, #2d1b69 0%, #1a0f40 60%, transparent 100%);
+    top:30%; right:-80px;
+    animation-duration:17s; animation-delay:-5s;
+  }
+  .blob3 {
+    width:400px; height:400px;
+    background:radial-gradient(circle, #0f3460 0%, #061a33 60%, transparent 100%);
+    bottom:10%; left:20%;
+    animation-duration:25s; animation-delay:-8s;
+  }
+  .blob4 {
+    width:350px; height:350px;
+    background:radial-gradient(circle, #1a1a5e 0%, #0a0a30 60%, transparent 100%);
+    bottom:30%; right:30%;
+    animation-duration:20s; animation-delay:-3s;
+  }
+  .blob5 {
+    width:280px; height:280px;
+    background:radial-gradient(circle, rgba(181,255,71,0.15) 0%, transparent 70%);
+    top:20%; left:40%;
+    animation-duration:30s; animation-delay:-12s;
+  }
+
+  @keyframes drift {
+    0% { transform:translate(0,0) scale(1); }
+    33% { transform:translate(40px,-30px) scale(1.05); }
+    66% { transform:translate(-20px,50px) scale(0.95); }
+    100% { transform:translate(30px,20px) scale(1.02); }
+  }
+
+  /* LIQUID GLASS — transparent frosted */
+  .glass {
+    background: linear-gradient(135deg,
+      rgba(255,255,255,0.06) 0%,
+      rgba(255,255,255,0.02) 50%,
+      rgba(255,255,255,0.05) 100%
+    );
+    backdrop-filter: blur(32px) saturate(200%) brightness(1.05);
+    -webkit-backdrop-filter: blur(32px) saturate(200%) brightness(1.05);
+    border: 1px solid rgba(255,255,255,0.14);
+    border-top-color: rgba(255,255,255,0.32);
+    border-left-color: rgba(255,255,255,0.22);
+    border-bottom-color: rgba(255,255,255,0.06);
+    border-right-color: rgba(255,255,255,0.08);
+    position:relative;
+    overflow:hidden;
+    box-shadow:
+      inset 0 1px 0 rgba(255,255,255,0.2),
+      inset 0 -1px 0 rgba(0,0,0,0.15),
+      0 4px 24px rgba(0,0,0,0.25),
+      0 1px 4px rgba(0,0,0,0.15);
+  }
+
+  /* top shine line */
+  .glass::before {
+    content:'';
+    position:absolute;
+    top:0; left:10%; right:10%;
+    height:1px;
+    background:linear-gradient(90deg,
+      transparent,
+      rgba(255,255,255,0.15) 20%,
+      rgba(255,255,255,0.55) 50%,
+      rgba(255,255,255,0.15) 80%,
+      transparent
+    );
+    pointer-events:none;
+    z-index:2;
+  }
+
+  /* internal light refraction diagonal */
+  .glass::after {
+    content:'';
+    position:absolute;
+    top:-50%; left:-50%;
+    width:60%; height:200%;
+    background:linear-gradient(105deg,
+      transparent 30%,
+      rgba(255,255,255,0.045) 45%,
+      rgba(255,255,255,0.09) 50%,
+      rgba(255,255,255,0.045) 55%,
+      transparent 70%
+    );
+    pointer-events:none;
+    z-index:2;
+    animation: glassSheen 8s ease-in-out infinite;
+    transform-origin: center;
+  }
+
+  @keyframes glassSheen {
+    0%,100% { opacity:0.6; transform:translateX(0); }
+    50% { opacity:1; transform:translateX(30px); }
+  }
+
+  .glass-strong {
+    background: linear-gradient(135deg,
+      rgba(255,255,255,0.09) 0%,
+      rgba(255,255,255,0.04) 50%,
+      rgba(255,255,255,0.08) 100%
+    );
+    backdrop-filter: blur(48px) saturate(220%) brightness(1.08);
+    -webkit-backdrop-filter: blur(48px) saturate(220%) brightness(1.08);
+    border: 1px solid rgba(255,255,255,0.2);
+    border-top-color: rgba(255,255,255,0.45);
+    border-left-color: rgba(255,255,255,0.3);
+    border-bottom-color: rgba(255,255,255,0.08);
+    position:relative;
+    overflow:hidden;
+    box-shadow:
+      inset 0 1px 0 rgba(255,255,255,0.3),
+      inset 0 -1px 0 rgba(0,0,0,0.2),
+      0 8px 40px rgba(0,0,0,0.35),
+      0 2px 8px rgba(0,0,0,0.2);
+  }
+
+  .glass-strong::before {
+    content:'';
+    position:absolute;
+    top:0; left:5%; right:5%;
+    height:1px;
+    background:linear-gradient(90deg,
+      transparent,
+      rgba(255,255,255,0.25) 20%,
+      rgba(255,255,255,0.75) 50%,
+      rgba(255,255,255,0.25) 80%,
+      transparent
+    );
+    pointer-events:none;
+    z-index:2;
+  }
+
+  .glass-strong::after {
+    content:'';
+    position:absolute;
+    top:-50%; left:-30%;
+    width:55%; height:200%;
+    background:linear-gradient(105deg,
+      transparent 30%,
+      rgba(255,255,255,0.07) 45%,
+      rgba(255,255,255,0.14) 50%,
+      rgba(255,255,255,0.07) 55%,
+      transparent 70%
+    );
+    pointer-events:none;
+    z-index:2;
+    animation: glassSheen 10s ease-in-out infinite reverse;
+  }
+
+  /* LAYOUT */
+  .page { position:relative; z-index:1; }
+
+  /* HERO */
+  .hero {
+    padding: 72px 48px 56px;
+    position:relative;
+  }
+
+  .hero-inner {
+    max-width:1200px; margin:0 auto;
+    display:flex; align-items:flex-end; gap:52px; flex-wrap:wrap;
+  }
+
+  .hero-title {
+    font-family: -apple-system, 'SF Pro Display', sans-serif;
+    font-size: clamp(80px, 12vw, 140px);
+    font-weight: 700;
+    line-height: 0.86;
+    letter-spacing: -4px;
+    color: var(--text);
+  }
+
+  .hero-title em {
+    display:block;
+    font-style:normal;
+    background: linear-gradient(135deg, var(--accent) 0%, #a8ff00 50%, #c8ff80 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    filter:drop-shadow(0 0 30px rgba(181,255,71,0.4));
+  }
+
+  .hero-right { flex:1; min-width:240px; padding-bottom:8px; }
+
+  .hero-label {
+    font-size:11px; color:var(--muted);
+    text-transform:uppercase; letter-spacing:2.5px; margin-bottom:8px;
+  }
+
+  .time-row {
+    display:flex; align-items:baseline; gap:14px; margin-bottom:20px;
+  }
+
+  .t-from {
+    font-weight:600; font-size:42px;
+    color:rgba(245,245,247,0.3);
+    text-decoration:line-through;
+    letter-spacing:-1px;
+  }
+
+  .t-arr { font-size:20px; color:var(--muted); }
+
+  .t-to {
+    font-weight:700; font-size:58px;
+    letter-spacing:-2px;
+    background: linear-gradient(135deg, var(--accent) 0%, #a8ff00 100%);
+    -webkit-background-clip:text;
+    -webkit-text-fill-color:transparent;
+    background-clip:text;
+    filter:drop-shadow(0 0 20px rgba(181,255,71,0.5));
+  }
+
+  .tags { display:flex; gap:8px; flex-wrap:wrap; }
+
+  .tag {
+    font-size:11px; letter-spacing:1px; text-transform:uppercase;
+    padding:5px 12px; border-radius:20px;
+    color:rgba(245,245,247,0.7);
+  }
+
+  /* NAV */
+  .nav {
+    position:sticky; top:0; z-index:100;
+    padding:10px 48px;
+    backdrop-filter: blur(48px) saturate(220%) brightness(0.95);
+    -webkit-backdrop-filter: blur(48px) saturate(220%) brightness(0.95);
+    background: rgba(10,14,26,0.45);
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+    box-shadow: 0 1px 0 rgba(255,255,255,0.06), 0 4px 20px rgba(0,0,0,0.3);
+  }
+
+  .nav-inner {
+    max-width:1200px; margin:0 auto;
+    display:flex; gap:6px; flex-wrap:wrap; align-items:center;
+  }
+
+  .nav-pill {
+    font-size:11px; text-transform:uppercase; letter-spacing:1.5px;
+    padding:6px 14px; border-radius:20px; border:none;
+    cursor:pointer; color:var(--muted); background:transparent;
+    transition:all .2s; font-family:inherit;
+  }
+
+  .nav-pill:hover {
+    color:var(--text);
+    background:rgba(255,255,255,0.08);
+  }
+
+  .nav-pill.active {
+    color:#000;
+    background:var(--accent);
+    font-weight:500;
+  }
+
+  /* STATS */
+  .stats-row {
+    max-width:1200px; margin:0 auto;
+    padding:28px 48px;
+    display:flex; gap:12px; flex-wrap:wrap;
+  }
+
+  .stat-card {
+    flex:1; min-width:110px;
+    border-radius:20px;
+    padding:18px 20px; text-align:center;
+  }
+
+  .stat-card .v {
+    font-size:28px; font-weight:700; letter-spacing:-1px;
+    color:var(--text); line-height:1;
+  }
+
+  .stat-card .v.accent {
+    background:linear-gradient(135deg, var(--accent), #a8ff00);
+    -webkit-background-clip:text;
+    -webkit-text-fill-color:transparent;
+    background-clip:text;
+  }
+
+  .stat-card .l {
+    font-size:10px; color:var(--muted);
+    text-transform:uppercase; letter-spacing:1.5px; margin-top:6px;
+  }
+
+  /* LEGEND */
+  .legend {
+    max-width:1200px; margin:0 auto;
+    padding:0 48px 28px;
+    display:flex; gap:16px; flex-wrap:wrap;
+  }
+
+  .leg { display:flex; align-items:center; gap:7px; font-size:11px; color:var(--muted); text-transform:uppercase; letter-spacing:1px; }
+  .leg-dot { width:8px; height:8px; border-radius:50%; flex-shrink:0; }
+
+  /* PHASES */
+  .phases { max-width:1200px; margin:0 auto; padding:0 48px 72px; }
+
+  .phase-block { margin-bottom:56px; }
+
+  .phase-head {
+    display:flex; align-items:center; gap:14px;
+    margin-bottom:20px; padding-bottom:16px;
+    border-bottom:1px solid rgba(255,255,255,0.06);
+    flex-wrap:wrap;
+  }
+
+  .phase-badge {
+    font-size:10px; font-weight:600; letter-spacing:2.5px;
+    padding:4px 12px; border-radius:20px; text-transform:uppercase;
+  }
+
+  .phase-name {
+    font-size:22px; font-weight:600; letter-spacing:-0.5px;
+  }
+
+  .phase-weeks { font-size:11px; color:var(--muted); margin-left:auto; letter-spacing:1px; }
+  .phase-note { font-size:12px; color:var(--muted); font-style:italic; width:100%; margin-top:-4px; }
+
+  /* WEEK CARDS */
+  .weeks { display:grid; grid-template-columns:repeat(auto-fill, minmax(340px,1fr)); gap:14px; }
+
+  .wcard {
+    border-radius:24px;
+    overflow:hidden;
+    transition:transform .2s cubic-bezier(0.34,1.56,0.64,1), box-shadow .2s;
+    cursor:default;
+  }
+
+  .wcard:hover {
+    transform:translateY(-4px) scale(1.005);
+    box-shadow:0 20px 60px rgba(0,0,0,0.4), 0 0 0 1px rgba(255,255,255,0.12);
+  }
+
+  .wcard.light { opacity:0.8; }
+
+  .wcard-head {
+    padding:14px 18px;
+    display:flex; align-items:center; justify-content:space-between;
+    border-bottom:1px solid rgba(255,255,255,0.06);
+    position:relative; z-index:3;
+  }
+
+  .wnum { font-size:16px; font-weight:600; letter-spacing:-0.3px; }
+
+  .wvol {
+    font-size:10px; color:var(--muted);
+    background:rgba(255,255,255,0.07);
+    border:1px solid rgba(255,255,255,0.1);
+    padding:3px 10px; border-radius:20px;
+  }
+
+  .wcard-body { padding:14px 18px; position:relative; z-index:3; }
+
+  .srow {
+    display:flex; gap:10px; align-items:flex-start;
+    padding:8px 0; border-bottom:1px solid rgba(255,255,255,0.05);
+  }
+  .srow:last-child { border-bottom:none; }
+
+  .sdot { width:8px; height:8px; border-radius:50%; margin-top:5px; flex-shrink:0; flex:0 0 8px; box-shadow:0 0 6px currentColor; }
+  .sday { font-size:10px; color:var(--muted); text-transform:uppercase; letter-spacing:1.5px; }
+  .sdesc { font-size:13px; line-height:1.4; margin-top:2px; font-weight:400; }
+  .sdetail { font-size:11px; color:var(--muted); margin-top:2px; line-height:1.4; }
+
+  /* PACES */
+  .paces-section, .tips-section {
+    max-width:1200px; margin:0 auto;
+    padding:0 48px 40px;
+  }
+
+  .section-label {
+    font-size:11px; font-weight:600; letter-spacing:2.5px;
+    color:var(--muted); text-transform:uppercase; margin-bottom:14px;
+  }
+
+  .pace-table { width:100%; border-collapse:collapse; font-size:13px; }
+  .pace-table th {
+    text-align:left; color:var(--muted); font-weight:400;
+    text-transform:uppercase; letter-spacing:1px; font-size:11px;
+    padding:8px 14px; border-bottom:1px solid rgba(255,255,255,0.06);
+  }
+  .pace-table td { padding:10px 14px; border-bottom:1px solid rgba(255,255,255,0.04); }
+  .pace-table tr:last-child td { border-bottom:none; }
+  .pace { font-size:16px; font-weight:600; letter-spacing:-0.5px;
+    background:linear-gradient(135deg, var(--accent), #a8ff00);
+    -webkit-background-clip:text; -webkit-text-fill-color:transparent;
+    background-clip:text;
+  }
+
+  .table-wrap { border-radius:20px; overflow:hidden; }
+
+  /* TIPS */
+  .tips { display:grid; grid-template-columns:repeat(auto-fill, minmax(230px,1fr)); gap:12px; margin-top:12px; }
+
+  .tip {
+    border-radius:16px;
+    padding:14px 16px;
+    font-size:12px; line-height:1.6; color:var(--muted);
+    border-left:3px solid var(--accent);
+    border-top-left-radius:0;
+    border-bottom-left-radius:0;
+  }
+
+  .tip strong { color:var(--text); display:block; margin-bottom:3px; font-size:13px; font-weight:500; }
+
+  /* SCROLLBAR */
+  ::-webkit-scrollbar { width:6px; }
+  ::-webkit-scrollbar-track { background:transparent; }
+  ::-webkit-scrollbar-thumb { background:rgba(255,255,255,0.15); border-radius:3px; }
+
+  @media(max-width:600px) {
+    .hero, .nav, .stats-row, .legend, .phases, .paces-section, .tips-section { padding-left:20px; padding-right:20px; }
+    .weeks { grid-template-columns:1fr; }
+    .hero-title { font-size:72px; }
+  }
+
+  /* LIQUID REFRACTION EFFECT on cards */
+  .wcard .glass::before,
+  .wcard .glass-strong::before { animation: sheen 6s ease-in-out infinite; }
+
+  @keyframes sheen {
+    0%,100% { opacity:0.5; }
+    50% { opacity:1; }
+  }
+
+  /* ===== iOS 26 TAB BAR ===== */
+  body { padding-bottom: 110px; }
+
+  .tabbar-wrap {
+    position: fixed;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 200;
+    filter: drop-shadow(0 8px 32px rgba(0,0,0,0.45)) drop-shadow(0 2px 8px rgba(0,0,0,0.3));
+  }
+
+  .tabbar {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    padding: 10px 14px;
+    border-radius: 28px;
+    background: linear-gradient(135deg,
+      rgba(255,255,255,0.10) 0%,
+      rgba(255,255,255,0.04) 50%,
+      rgba(255,255,255,0.08) 100%
+    ) !important;
+    backdrop-filter: blur(50px) saturate(220%) brightness(1.1) !important;
+    -webkit-backdrop-filter: blur(50px) saturate(220%) brightness(1.1) !important;
+    border: 1px solid rgba(255,255,255,0.22) !important;
+    border-top-color: rgba(255,255,255,0.45) !important;
+    box-shadow:
+      inset 0 1px 0 rgba(255,255,255,0.28),
+      inset 0 -1px 0 rgba(0,0,0,0.18),
+      0 20px 60px rgba(0,0,0,0.5),
+      0 4px 16px rgba(0,0,0,0.3) !important;
+    min-width: 320px;
+  }
+
+  .tab-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+    padding: 4px 10px;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.34,1.56,0.64,1);
+    position: relative;
+    flex: 1;
+    min-width: 60px;
+  }
+
+  .tab-item span {
+    font-size: 10px;
+    letter-spacing: 0.3px;
+    color: rgba(245,245,247,0.5);
+    transition: color 0.25s;
+    font-weight: 400;
+    white-space: nowrap;
+  }
+
+  /* Normal icon container */
+  .tab-icon {
+    width: 44px; height: 44px;
+    display: flex; align-items: center; justify-content: center;
+    border-radius: 50%;
+    color: rgba(245,245,247,0.55);
+    transition: all 0.3s cubic-bezier(0.34,1.56,0.64,1);
+  }
+
+  /* ACTIVE BUBBLE — the iOS 26 pill */
+  .tab-bubble {
+    width: 52px; height: 44px;
+    display: flex; align-items: center; justify-content: center;
+    border-radius: 22px;
+    position: relative;
+    overflow: hidden;
+    background: linear-gradient(160deg,
+      rgba(255,255,255,0.22) 0%,
+      rgba(255,255,255,0.08) 40%,
+      rgba(255,255,255,0.14) 100%
+    );
+    backdrop-filter: blur(20px) saturate(200%) brightness(1.15);
+    -webkit-backdrop-filter: blur(20px) saturate(200%) brightness(1.15);
+    border: 1px solid rgba(255,255,255,0.35);
+    border-top-color: rgba(255,255,255,0.6);
+    box-shadow:
+      inset 0 1px 0 rgba(255,255,255,0.45),
+      inset 0 -1px 0 rgba(0,0,0,0.12),
+      0 4px 16px rgba(0,0,0,0.25),
+      0 1px 4px rgba(0,0,0,0.15);
+    color: #fff;
+    transition: all 0.3s cubic-bezier(0.34,1.56,0.64,1);
+  }
+
+  /* bubble top shine */
+  .tab-bubble::before {
+    content:'';
+    position:absolute;
+    top:0; left:15%; right:15%;
+    height:1px;
+    background:linear-gradient(90deg, transparent, rgba(255,255,255,0.7) 50%, transparent);
+    z-index:2;
+  }
+
+  /* bubble inner diagonal glow */
+  .tab-bubble::after {
+    content:'';
+    position:absolute;
+    top:-40%; left:-20%;
+    width:50%; height:180%;
+    background:linear-gradient(110deg,
+      transparent 30%,
+      rgba(255,255,255,0.12) 45%,
+      rgba(255,255,255,0.22) 50%,
+      rgba(255,255,255,0.12) 55%,
+      transparent 70%
+    );
+    z-index:2;
+    pointer-events:none;
+  }
+
+  /* active tab label */
+  .tab-item.active span {
+    color: rgba(245,245,247,0.9);
+    font-weight: 500;
+  }
+
+  /* tab-search (no label, round) */
+  .tab-search { min-width: 52px; flex:0 0 52px; }
+  .tab-search .tab-icon {
+    width: 44px; height: 44px; border-radius: 50%;
+    background: rgba(255,255,255,0.07);
+    border: 1px solid rgba(255,255,255,0.14);
+    color: rgba(245,245,247,0.7);
+  }
+  .tab-search:hover .tab-icon {
+    background: rgba(255,255,255,0.12);
+    color: #fff;
+    transform: scale(1.08);
+  }
+
+  /* hover on inactive tabs */
+  .tab-item:not(.active):hover .tab-icon {
+    background: rgba(255,255,255,0.07);
+    color: rgba(245,245,247,0.85);
+    transform: scale(1.05);
+  }
+
+  /* press animation */
+  .tab-item:active { transform: scale(0.93); }
+
+  /* Tab bar entrance animation */
+  @keyframes tabbarIn {
+    from { opacity:0; transform:translateX(-50%) translateY(20px) scale(0.95); }
+    to   { opacity:1; transform:translateX(-50%) translateY(0)   scale(1); }
+  }
+  .tabbar-wrap { animation: tabbarIn 0.5s cubic-bezier(0.34,1.56,0.64,1) 0.3s both; }
+
+</style>
+</head>
+<body>
+
+<!-- BACKGROUND -->
+<div class="bg-canvas">
+  <div class="blob blob1"></div>
+  <div class="blob blob2"></div>
+  <div class="blob blob3"></div>
+  <div class="blob blob4"></div>
+  <div class="blob blob5"></div>
+</div>
+
+<div class="page">
+
+<div class="hero">
+  <div class="hero-inner">
+    <div>
+      <div class="hero-title">5 KM<em>Sub 18:00</em></div>
+    </div>
+    <div class="hero-right">
+      <div class="hero-label">Objectif</div>
+      <div class="time-row">
+        <span class="t-from">19'55</span>
+        <span class="t-arr">→</span>
+        <span class="t-to">17'59</span>
+      </div>
+      <div class="tags">
+        <span class="tag glass" style="border-radius:20px">17 semaines</span>
+        <span class="tag glass" style="border-radius:20px">S1–4 : 4j/sem</span>
+        <span class="tag glass" style="border-radius:20px">S5–14 : 6j/sem</span>
+        <span class="tag glass" style="border-radius:20px">S15–17 : 4j/sem</span>
+        <span class="tag glass" style="border-radius:20px">Allure cible 3:36/km</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<nav class="nav">
+  <div class="nav-inner" id="navPills"></div>
+</nav>
+
+<div class="stats-row">
+  <div class="stat-card glass" style="border-radius:20px"><div class="v">17</div><div class="l">Semaines</div></div>
+  <div class="stat-card glass" style="border-radius:20px"><div class="v">76</div><div class="l">Séances</div></div>
+  <div class="stat-card glass" style="border-radius:20px"><div class="v accent">−1'56</div><div class="l">Gain visé</div></div>
+  <div class="stat-card glass" style="border-radius:20px"><div class="v accent">3:36</div><div class="l">Allure cible /km</div></div>
+  <div class="stat-card glass" style="border-radius:20px"><div class="v">28→50</div><div class="l">km/sem</div></div>
+</div>
+
+<div class="legend">
+  <div class="leg"><div class="leg-dot" style="background:var(--c-recup);box-shadow:0 0 6px var(--c-recup)"></div>Footing récup</div>
+  <div class="leg"><div class="leg-dot" style="background:var(--c-ef);box-shadow:0 0 6px var(--c-ef)"></div>Endurance fond.</div>
+  <div class="leg"><div class="leg-dot" style="background:var(--c-tempo);box-shadow:0 0 6px var(--c-tempo)"></div>Tempo / Seuil</div>
+  <div class="leg"><div class="leg-dot" style="background:var(--c-frac);box-shadow:0 0 6px var(--c-frac)"></div>Fractionné VMA</div>
+  <div class="leg"><div class="leg-dot" style="background:var(--c-longue);box-shadow:0 0 6px var(--c-longue)"></div>Sortie longue</div>
+  <div class="leg"><div class="leg-dot" style="background:var(--c-cross);box-shadow:0 0 6px var(--c-cross)"></div>Cross-training</div>
+</div>
+
+<div class="phases" id="phases"></div>
+
+<div class="paces-section">
+  <div class="section-label">Allures de référence</div>
+  <div class="table-wrap glass">
+    <table class="pace-table">
+      <thead><tr><th>Type</th><th>Allure /km</th><th>Description</th></tr></thead>
+      <tbody>
+        <tr><td>Récupération</td><td><span class="pace">6:00–6:30</span></td><td style="color:var(--muted)">Très facile, conversation fluide</td></tr>
+        <tr><td>Endurance fondamentale</td><td><span class="pace">5:10–5:30</span></td><td style="color:var(--muted)">Confortable, légèrement essoufflé</td></tr>
+        <tr><td>Tempo / Seuil</td><td><span class="pace">3:58–4:15</span></td><td style="color:var(--muted)">Difficile mais tenable 20–40 min</td></tr>
+        <tr><td>Allure 5K cible</td><td><span class="pace">3:35–3:40</span></td><td style="color:var(--muted)">Vive, objectif course</td></tr>
+        <tr><td>VMA / fractionné court</td><td><span class="pace">3:10–3:25</span></td><td style="color:var(--muted)">Effort max court, récup égale</td></tr>
+        <tr><td>Côtes (30s effort)</td><td><span class="pace">~3:05–3:15</span></td><td style="color:var(--muted)">Effort max perçu, descente trot récup</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<div class="tips-section">
+  <div class="section-label">Conseils clés</div>
+  <div class="tips">
+    <div class="tip glass"><strong>Échauffement</strong>15 min trot + gammes avant chaque séance de qualité.</div>
+    <div class="tip glass"><strong>Retour au calme</strong>10–15 min trot très facile + étirements après chaque séance intense.</div>
+    <div class="tip glass"><strong>Côtes</strong>1 sortie longue sur 2, et option S5–S14 en remplacement d'un fractionné.</div>
+    <div class="tip glass"><strong>Cross-training</strong>Vélo ou natation les jours off : cardio sans impact sur les jambes.</div>
+    <div class="tip glass"><strong>FC au repos</strong>+7–8 bpm vs ta normale = signal de fatigue, allège la séance.</div>
+    <div class="tip glass"><strong>Sommeil</strong>8h minimum — les adaptations musculaires se font la nuit.</div>
+    <div class="tip glass"><strong>Tests 5K</strong>Semaines 8 et 17 : course chrono pour mesurer la progression.</div>
+    <div class="tip glass"><strong>Negative split</strong>Km1 à 3:42–3:45, puis accélération progressive jusqu'au finish.</div>
+  </div>
+  <div style="height:40px"></div>
+</div>
+
+
+  <!-- iOS 26 LIQUID GLASS TAB BAR -->
+  <div class="tabbar-wrap">
+    <div class="tabbar glass-strong">
+      <div class="tab-item active" onclick="tabClick(this,'p1')">
+        <div class="tab-bubble">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+        </div>
+        <span>Phase 1</span>
+      </div>
+      <div class="tab-item" onclick="tabClick(this,'p2')">
+        <div class="tab-icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
+        </div>
+        <span>Phase 2</span>
+      </div>
+      <div class="tab-item" onclick="tabClick(this,'p3')">
+        <div class="tab-icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        </div>
+        <span>Phase 3</span>
+      </div>
+      <div class="tab-item" onclick="tabClick(this,'p4')">
+        <div class="tab-icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+        </div>
+        <span>Objectif</span>
+      </div>
+      <div class="tab-item tab-search" onclick="tabClick(this,null)">
+        <div class="tab-icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+const C = {
+  recup:'var(--c-recup)', ef:'var(--c-ef)', tempo:'var(--c-tempo)',
+  frac:'var(--c-frac)', longue:'var(--c-longue)', repos:'var(--c-repos)', cross:'var(--c-cross)'
+};
+
+const R=(j,t,d,det)=>({day:j,type:t,desc:d,detail:det});
+const REST=(j,d)=>R(j,'repos','Repos complet',d||'Récupération active recommandée');
+const CROSS=(j,d)=>R(j,'cross',d||'Cross-training 45 min','Vélo ou natation — cardio sans impact');
+
+const plan=[
+  {
+    id:'p1',phase:'Phase 1 — Fondations aérobies',weeks:'Semaines 1–4',
+    color:'#4a9eff',note:'4 séances/sem · 3 jours off (cross-training ou repos)',
+    data:[
+      {num:1,vol:'~28 km',light:false,sessions:[
+        R('Lundi','ef','Endurance fondamentale 40 min','~5:25/km — terrain plat, rythme conversation'),
+        R('Mercredi','frac','8 × 200m','Rec 1:30 trot — ~3:20/km · Footing 15 min'),
+        R('Vendredi','tempo','Tempo 3 × 8 min','Rec 3 min marche — ~4:12/km'),
+        R('Dimanche','longue','Sortie longue 55 min','~5:25/km — plat ou légèrement vallonné'),
+      ]},
+      {num:2,vol:'~30 km',light:false,sessions:[
+        R('Lundi','ef','Endurance fondamentale 45 min','~5:20/km'),
+        R('Mercredi','frac','10 × 200m','Rec 1:30 trot — ~3:18/km · Footing 15 min'),
+        R('Vendredi','tempo','Tempo 4 × 8 min','Rec 2:30 — ~4:08/km'),
+        R('Dimanche','longue','Sortie longue 60 min','~5:20/km — 1 sortie sur 2 avec dénivelé'),
+      ]},
+      {num:3,vol:'~32 km',light:false,sessions:[
+        R('Lundi','ef','Endurance fondamentale 50 min','~5:20/km'),
+        R('Mercredi','frac','6 × 400m','Rec 2 min — ~3:30/km · Footing 20 min'),
+        R('Vendredi','tempo','Tempo 2 × 12 min','Rec 4 min — ~4:05/km'),
+        R('Dimanche','longue','Sortie longue 65 min','~5:15/km — vallonné bienvenu'),
+      ]},
+      {num:4,vol:'~22 km',light:true,sessions:[
+        R('Lundi','recup','Footing récupération 25 min','~6:15/km — très facile'),
+        R('Mercredi','frac','6 × 200m allure 5K','Rec 2 min — ~3:38/km'),
+        R('Vendredi','ef','Endurance 35 min','~5:25/km'),
+        R('Dimanche','longue','Sortie longue allégée 45 min','~5:30/km'),
+      ]},
+    ]
+  },
+  {
+    id:'p2',phase:'Phase 2 — Construction & seuil',weeks:'Semaines 5–8',
+    color:'#ff9f0a',note:'6 séances/sem · 1 jour repos complet · Cross-training les jours off',
+    data:[
+      {num:5,vol:'~38 km',light:false,sessions:[
+        R('Lundi','recup','Footing récupération 30 min','~6:05/km'),
+        CROSS('Mardi','Cross-training 40 min'),
+        R('Mercredi','tempo','Tempo continu 20 min','~4:05/km — effort soutenu maîtrisé'),
+        R('Jeudi','ef','Endurance fondamentale 45 min','~5:15/km'),
+        R('Vendredi','frac','8 × 400m','Rec 90 sec — ~3:28/km · Footing 20 min'),
+        R('Dimanche','longue','Sortie longue 70 min','~5:15/km'),
+      ]},
+      {num:6,vol:'~42 km',light:false,sessions:[
+        R('Lundi','recup','Footing récupération 30 min','~6:05/km'),
+        CROSS('Mardi'),
+        R('Mercredi','tempo','2 × 12 min tempo','Rec 4 min — ~4:02/km'),
+        R('Jeudi','ef','Endurance fondamentale 50 min','~5:15/km'),
+        R('Vendredi','frac','6 × 600m','Rec 2 min — ~3:28/km · Footing 20 min'),
+        R('Dimanche','longue','Sortie longue 75 min','~5:10/km'),
+      ]},
+      {num:7,vol:'~44 km',light:false,sessions:[
+        R('Lundi','recup','Footing récupération 35 min','~6:00/km'),
+        CROSS('Mardi'),
+        R('Mercredi','tempo','Tempo continu 25 min','~4:00/km'),
+        R('Jeudi','ef','Endurance fondamentale 50 min','~5:12/km'),
+        R('Vendredi','frac','10 × 400m','Rec 90 sec — ~3:25/km · Footing 20 min'),
+        R('Dimanche','longue','Sortie longue 75 min','~5:10/km — terrain vallonné'),
+      ]},
+      {num:8,vol:'~30 km',light:true,sessions:[
+        R('Lundi','recup','Footing récupération 25 min','~6:15/km'),
+        CROSS('Mardi','Cross-training léger 30 min'),
+        R('Mercredi','ef','Endurance 35 min','~5:20/km'),
+        R('Jeudi','recup','Footing léger 20 min','Préparation test'),
+        R('Samedi','recup','Footing 15 min + 4 accélérations','Jambes prêtes'),
+        R('Dimanche','frac','🏁 TEST 5 KM','Course chrono — allure visée ~3:45–3:50/km'),
+      ]},
+    ]
+  },
+  {
+    id:'p3',phase:'Phase 3 — VMA & puissance',weeks:'Semaines 9–14',
+    color:'#ff453a',note:'6 séances/sem · 1 jour repos complet · Cross-training les jours off',
+    data:[
+      {num:9,vol:'~44 km',light:false,sessions:[
+        R('Lundi','recup','Footing récupération 30 min','~6:00/km'),
+        CROSS('Mardi'),
+        R('Mercredi','frac','5 × 1000m','Rec 2:30 — ~3:42/km · Footing 20 min'),
+        R('Jeudi','ef','Endurance fondamentale 50 min','~5:10/km'),
+        R('Vendredi','tempo','3 × 10 min tempo','Rec 3 min — ~3:58/km'),
+        R('Dimanche','longue','Sortie longue 80 min','~5:08/km — finish 10 min à ~4:20/km'),
+      ]},
+      {num:10,vol:'~46 km',light:false,sessions:[
+        R('Lundi','recup','Footing récupération 30 min','~5:58/km'),
+        CROSS('Mardi'),
+        R('Mercredi','frac','6 × 800m','Rec 2 min — ~3:32/km · Footing 20 min'),
+        R('Jeudi','ef','Endurance fondamentale 55 min','~5:10/km'),
+        R('Vendredi','tempo','Tempo continu 28 min','~3:58/km'),
+        R('Dimanche','longue','Sortie longue 80 min','~5:08/km — vallonné'),
+      ]},
+      {num:11,vol:'~48 km',light:false,sessions:[
+        R('Lundi','recup','Footing récupération 35 min','~5:58/km'),
+        CROSS('Mardi'),
+        R('Mercredi','frac','8 × 30 sec côtes à 6–8%','Rec : descente au trot — puissance musculaire'),
+        R('Jeudi','ef','Endurance fondamentale 55 min','~5:08/km'),
+        R('Vendredi','tempo','4 × 8 min allure 5K cible','Rec 3 min — ~3:36/km'),
+        R('Dimanche','longue','Sortie longue 80 min','~5:05/km — terrain vallonné'),
+      ]},
+      {num:12,vol:'~50 km',light:false,sessions:[
+        R('Lundi','recup','Footing récupération 35 min','~5:55/km'),
+        CROSS('Mardi'),
+        R('Mercredi','frac','4 × 1200m','Rec 3 min — ~3:35/km · Footing 15 min'),
+        R('Jeudi','ef','Endurance fondamentale 55 min','~5:08/km'),
+        R('Vendredi','tempo','3 × 10 min allure 5K cible','Rec 3 min — ~3:36/km'),
+        R('Dimanche','longue','Sortie longue 85 min','~5:05/km'),
+      ]},
+      {num:13,vol:'~44 km',light:false,sessions:[
+        R('Lundi','recup','Footing récupération 30 min','~6:00/km'),
+        CROSS('Mardi'),
+        R('Mercredi','frac','10 × 30 sec côtes','Rec : descente trot — intensité max'),
+        R('Jeudi','ef','Endurance fondamentale 50 min','~5:10/km'),
+        R('Vendredi','tempo','2 × 12 min allure 5K cible','Rec 4 min — ~3:36/km'),
+        R('Dimanche','longue','Sortie longue 80 min','~5:05/km'),
+      ]},
+      {num:14,vol:'~32 km',light:true,sessions:[
+        R('Lundi','recup','Footing récupération 25 min','~6:10/km'),
+        CROSS('Mardi','Cross-training léger 30 min'),
+        R('Mercredi','frac','5 × 400m allure cible','Rec 2 min — ~3:35/km'),
+        R('Jeudi','ef','Endurance 35 min','~5:20/km'),
+        R('Vendredi','recup','Footing 20 min + 4 accélérations','Très léger'),
+        R('Dimanche','longue','Sortie longue allégée 50 min','~5:20/km'),
+      ]},
+    ]
+  },
+  {
+    id:'p4',phase:'Phase 4 — Affûtage & performance',weeks:'Semaines 15–17',
+    color:'#b5ff47',note:'4 séances/sem · Réduire le volume, maintenir l\'intensité — arriver frais',
+    data:[
+      {num:15,vol:'~26 km',light:true,sessions:[
+        R('Lundi','recup','Footing récupération 25 min','~6:10/km'),
+        R('Mercredi','tempo','3 × 6 min allure 5K cible','Rec 3 min — ~3:35/km'),
+        R('Vendredi','frac','6 × 300m','Rec 2 min — ~3:30/km — garder la vivacité'),
+        R('Dimanche','longue','Sortie 55 min dont 15 min à ~4:10/km','Finish progressif'),
+      ]},
+      {num:16,vol:'~18 km',light:true,sessions:[
+        R('Lundi','recup','Footing récupération 20 min','Très facile'),
+        R('Mercredi','frac','4 × 400m allure cible','Rec 2 min — ~3:35/km'),
+        R('Vendredi','recup','Footing 20 min + 5 accélérations de 80m','Garder les jambes vives'),
+        R('Dimanche','ef','Footing 35 min facile','~5:25/km — repos mental'),
+      ]},
+      {num:17,vol:'~12 km',light:true,sessions:[
+        R('Lundi','recup','Footing 20 min très léger','Garder les jambes actives uniquement'),
+        R('Mercredi','frac','3 × 200m allure cible','Rec 2 min — activer les fibres rapides'),
+        R('Vendredi','recup','Footing 15 min + 3 accélérations','Très léger — préserver l\'énergie'),
+        R('Dimanche','frac','🏁 COURSE 5 KM — OBJECTIF SUB 18:00','Départ 3:42/km → négatif split → finish à fond'),
+      ]},
+    ]
+  }
+];
+
+function render(){
+  const nav=document.getElementById('navPills');
+  plan.forEach(p=>{
+    const btn=document.createElement('button');
+    btn.className='nav-pill';
+    btn.textContent=p.phase.split('—')[1]?.trim()||p.phase;
+    btn.onclick=()=>document.getElementById(p.id).scrollIntoView({behavior:'smooth',block:'start'});
+    nav.appendChild(btn);
+  });
+
+  const container=document.getElementById('phases');
+
+  plan.forEach(phase=>{
+    const block=document.createElement('div');
+    block.className='phase-block'; block.id=phase.id;
+
+    const isLight=phase.color==='#b5ff47';
+    const ph=document.createElement('div');
+    ph.className='phase-head';
+    ph.innerHTML=`
+      <span class="phase-badge" style="background:${phase.color}22;color:${phase.color};border:1px solid ${phase.color}44">${phase.phase.split('—')[0].trim()}</span>
+      <span class="phase-name" style="color:${isLight?phase.color:'var(--text)'}">${phase.phase.split('—')[1]?.trim()||''}</span>
+      <span class="phase-weeks">${phase.weeks}</span>
+      <span class="phase-note">${phase.note}</span>
+    `;
+    block.appendChild(ph);
+
+    const grid=document.createElement('div');
+    grid.className='weeks';
+
+    phase.data.forEach(week=>{
+      const card=document.createElement('div');
+      card.className='wcard glass'+(week.light?' light':'');
+      card.innerHTML=`
+        <div class="wcard-head" style="position:relative;z-index:3">
+          <span class="wnum">Semaine ${week.num}</span>
+          <span class="wvol">${week.vol}${week.light?' · Allégée':''}</span>
+        </div>
+        <div class="wcard-body">
+          ${week.sessions.map(s=>`
+            <div class="srow">
+              <div class="sdot" style="background:${C[s.type]};box-shadow:0 0 8px ${C[s.type]}"></div>
+              <div>
+                <div class="sday">${s.day}</div>
+                <div class="sdesc">${s.desc}</div>
+                <div class="sdetail">${s.detail}</div>
+              </div>
+            </div>
+          `).join('')}
+        </div>
+      `;
+      grid.appendChild(card);
+    });
+
+    block.appendChild(grid);
+    container.appendChild(block);
+  });
+
+  // Scroll spy
+  const observer=new IntersectionObserver(entries=>{
+    entries.forEach(e=>{
+      if(e.isIntersecting){
+        document.querySelectorAll('.nav-pill').forEach((p,i)=>{
+          p.classList.toggle('active',plan[i].id===e.target.id);
+        });
+      }
+    });
+  },{threshold:0.15});
+
+  plan.forEach(p=>{const el=document.getElementById(p.id);if(el)observer.observe(el);});
+}
+
+render();
+
+function tabClick(el, targetId) {
+  document.querySelectorAll('.tab-item').forEach(t => {
+    t.classList.remove('active');
+    // convert bubble back to icon if needed
+    const bubble = t.querySelector('.tab-bubble');
+    if (bubble) {
+      const svg = bubble.innerHTML;
+      const iconDiv = document.createElement('div');
+      iconDiv.className = 'tab-icon';
+      iconDiv.innerHTML = svg;
+      bubble.replaceWith(iconDiv);
+    }
+  });
+
+  el.classList.add('active');
+  // convert icon to bubble for active
+  const icon = el.querySelector('.tab-icon');
+  if (icon) {
+    const svg = icon.innerHTML;
+    const bubbleDiv = document.createElement('div');
+    bubbleDiv.className = 'tab-bubble';
+    bubbleDiv.innerHTML = svg;
+    icon.replaceWith(bubbleDiv);
+  }
+
+  if (targetId) {
+    const target = document.getElementById(targetId);
+    if (target) target.scrollIntoView({ behavior:'smooth', block:'start' });
+  }
+}
+
+</script>
+</body>
+</html>
